@@ -1,1 +1,1 @@
-// export type typeOfInput = "string" | "number" | "email" | "phone" | "checkbox"; -- не всё по идее
+// export type typeOfInput = "text" | "number" | "password" | "radio" | "checkbox" | "email" | "date" | "color" - мб ещё что-то

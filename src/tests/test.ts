@@ -24,26 +24,36 @@ export const form = (formElement: HTMLFormElement) => {
       });
     return {
       field(fieldName: string) {
-        const inputField = formElement.querySelector(
+        const inputField: HTMLInputElement | null = formElement.querySelector(
           `input[name='${fieldName}']`
         );
-        const typeOfInput: string = "";
+        if (!inputField) {
+          throw Error("There is no input field with this name in this form.")
+        }
         const validator = {
-          string: () => {
-            return validator;
+          string() {
+            inputField.type = "text"
+            // type for inputFieldType - Literal Type
+            return validator
           },
-          number: () => {
-            return validator;
+          number() {
+            inputField.type = "number"
+            return validator
           },
-          min: (error: string) => {
-            return validator;
+          min(error: string) {
+            // code
+            return validator
           },
           max: (error: string) => {
-            return validator;
+            // code
+            return validator
           },
         };
-        return validator;
+        return validator
       },
+    validate(){
+      // code
+    }
     };
   }
 };
