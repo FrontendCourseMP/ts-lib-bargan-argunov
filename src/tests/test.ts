@@ -1,15 +1,17 @@
-export const form = (formElement: HTMLFormElement) => {
+import type { FormFn, FieldValidator } from "../types/types";
+
+export const form: FormFn = (formElement: HTMLFormElement) => {
   const obj: Record<string, unknown> = {};
   const inputFields = formElement?.querySelectorAll("input");
   if (
-    !Array.from(inputFields).every((inputField) => {
+    !Array.from(inputFields).some((inputField) => {
       const ariaValue = inputField.getAttribute("aria-describedby");
       const outputField =
         ariaValue && formElement.querySelector(`#${ariaValue}`);
       return (
-        (!inputField.labels || inputField.labels.length === 0) &&
-        !inputField.id &&
-        !inputField.name &&
+        (!inputField.labels || inputField.labels.length === 0) ||
+        !inputField.id ||
+        !inputField.name ||
         !outputField
       );
     })
@@ -19,7 +21,7 @@ export const form = (formElement: HTMLFormElement) => {
     );
   } else {
     inputFields?.length &&
-      Array.from(inputFields).forEach((inputField) => {
+      Array.from(inputFields).forEach((inputField: HTMLInputElement) => {
         obj[inputField.name] = null;
       });
     return {
@@ -30,7 +32,7 @@ export const form = (formElement: HTMLFormElement) => {
         if (!inputField) {
           throw Error("There is no input field with this name in this form.")
         }
-        const validator = {
+        const validator: FieldValidator = {
           string() {
             inputField.type = "text"
             // type for inputFieldType - Literal Type
