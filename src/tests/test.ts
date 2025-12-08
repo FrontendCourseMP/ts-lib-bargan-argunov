@@ -42,7 +42,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
           },
           number() {
             if (!["text", "number", "range"].includes(inputField.type)) {
-              throw Error("Narrowing of types is impossible because the type 'text' or 'number' or 'range ' cannot be narrowed to this type.")
+              throw Error("Narrowing of types is impossible because the type 'text' or 'number' or 'range' cannot be narrowed to this type.")
             }
             if (inputField.type === "text") {
               inputField.setAttribute("pattern", '[0-9]+');
@@ -62,7 +62,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
               }
             }
             else if(["number", "range"].includes(inputField.type)) {
-              if (inputField.min === '-1') {
+              if (inputField.min === '') {
                 throw Error(`InputField with name ${inputField.name} does not contain a value for the attribute "min"`)
               }
             }
@@ -76,7 +76,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
               }
             }
             else if(["number", "range"].includes(inputField.type)) {
-              if (inputField.max === '-1') {
+              if (inputField.max === '') {
                 throw Error(`InputField with name ${inputField.name} does not contain a value for the attribute "max"`)
               }
             }
@@ -94,37 +94,40 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
           const ariaValue = inputField.getAttribute("aria-describedby");
           const outputField = ariaValue && formElement.querySelector(`#${ariaValue}`) as HTMLOutputElement;
           
+          const fieldNameErrors = obj[fieldName]
+
           if (!outputField) return;
-          
+          if (!fieldNameErrors) return;
+
           outputField!.textContent = '';
           
           const validity = inputField.validity;
-          
+
           if (!validity.valid) {
             if (validity.rangeUnderflow) {
-              outputField.textContent = (obj[fieldName] && obj[fieldName]['min']) 
-                ? obj[fieldName]['min'] 
+              outputField.textContent = (fieldNameErrors['min']) 
+                ? fieldNameErrors['min'] 
                 : inputField.validationMessage;
               return;
             }
             
             if (validity.rangeOverflow) {
-              outputField.textContent = (obj[fieldName] && obj[fieldName]['max']) 
-                ? obj[fieldName]['max'] 
+              outputField.textContent = (fieldNameErrors['max']) 
+                ? fieldNameErrors['max'] 
                 : inputField.validationMessage;
               return;
             }
             
             if (validity.tooShort) {
-              outputField.textContent = (obj[fieldName] && obj[fieldName]['min']) 
-                ? obj[fieldName]['min'] 
+              outputField.textContent = (fieldNameErrors['min']) 
+                ? fieldNameErrors['min'] 
                 : inputField.validationMessage;
               return;
             }
             
             if (validity.tooLong) {
-              outputField.textContent = (obj[fieldName] && obj[fieldName]['max']) 
-                ? obj[fieldName]['max'] 
+              outputField.textContent = (fieldNameErrors['max']) 
+                ? fieldNameErrors['max'] 
                 : inputField.validationMessage;
               return;
             }
