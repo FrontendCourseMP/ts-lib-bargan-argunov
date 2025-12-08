@@ -2,6 +2,7 @@
 
 // Валидатор поля, который возвращает form(...).field(...)
 export type FieldValidator = {
+  boolean: () => FieldValidator;
   string: () => FieldValidator;
   number: () => FieldValidator;
   min: (error: string) => FieldValidator;
@@ -19,6 +20,3 @@ export type FormObject = {
 
 // Сигнатура функции form из test.ts
 export type FormFn = (formElement: HTMLFormElement) => FormObject;
-
-
-

@@ -4,4 +4,5 @@ const formElement = document!.querySelector("form") as HTMLFormElement;
 
 const validator = c.form(formElement);
 
-validator.field("dada").max("DADA").number()
+validator.field("hahah").boolean()
+validator.validate()
