@@ -1,6 +1,7 @@
 import type { FormFn, FieldValidator } from "../types/types";
 
 export const form: FormFn = (formElement: HTMLFormElement) => {
+  let formIsValid = true
   const obj: Record<string, Record<string, string>> = {};
   const inputFields = formElement?.querySelectorAll("input");
   if (
@@ -117,6 +118,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
             const validity = inputField.validity;
 
             if (!validity.valid) {
+              formIsValid = false
               if (validity.rangeUnderflow) {
                 outputField.textContent = fieldNameErrors["min"]
                   ? fieldNameErrors["min"]
@@ -151,10 +153,12 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
 
             if (fieldNameErrors["min"]) {
               let isValid = true;
+              formIsValid = false
               if (inputField.type === "text") {
                 const minLength = inputField.minLength;
                 if (minLength !== -1 && inputField.value.length < minLength) {
                   isValid = false;
+                  formIsValid =  false
                 }
               } else if (["number", "range"].includes(inputField.type)) {
                 const min = parseFloat(inputField.min);
@@ -166,6 +170,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
                   value < min
                 ) {
                   isValid = false;
+                  formIsValid = false;
                 }
               }
               if (!isValid) {
@@ -180,6 +185,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
                 const maxLength = inputField.maxLength;
                 if (maxLength !== -1 && inputField.value.length > maxLength) {
                   isValid = false;
+                  formIsValid = false;
                 }
               } else if (["number", "range"].includes(inputField.type)) {
                 const max = parseFloat(inputField.max);
@@ -191,6 +197,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
                   value > max
                 ) {
                   isValid = false;
+                  formIsValid = false;
                 }
               }
               if (!isValid) {
@@ -200,6 +207,7 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
             }
           });
         });
+      return formIsValid
       },
     };
   }

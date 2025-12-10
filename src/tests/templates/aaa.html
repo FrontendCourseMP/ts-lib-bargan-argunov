@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ts-val</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <section>
+        <h1>Форма с валидацией</h1>
+        <form novalidate id="exampleForm">
+          <div class="form-group">
+            <label for="name">Имя (только буквы)</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              aria-describedby="name-error" 
+              required
+            />
+            <p role="alert" id="name-error" class="error-message"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="age">Возраст (от 18 до 100)</label>
+            <input 
+              type="number" 
+              id="age" 
+              name="age" 
+              min="18" 
+              max="100" 
+              aria-describedby="age-error" 
+              required
+            />
+            <p role="alert" id="age-error" class="error-message"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="salary">Зарплата (от 30000 до 500000)</label>
+            <input 
+              type="number" 
+              id="salary" 
+              name="salary" 
+              min="30000" 
+              max="500000" 
+              aria-describedby="salary-error" 
+              required
+            />
+            <p role="alert" id="salary-error" class="error-message"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="bio">О себе (от 10 до 200 символов)</label>
+            <input 
+              type="text" 
+              id="bio" 
+              name="bio" 
+              minlength="10" 
+              maxlength="200" 
+              aria-describedby="bio-error" 
+              required
+            />
+            <p role="alert" id="bio-error" class="error-message"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="isActive">Активен (true/false)</label>
+            <input 
+              type="text" 
+              id="isActive" 
+              name="isActive" 
+              aria-describedby="isActive-error" 
+              required
+            />
+            <p role="alert" id="isActive-error" class="error-message"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Телефон (только цифры)</label>
+            <input 
+              type="text" 
+              id="phone" 
+              name="phone" 
+              aria-describedby="phone-error" 
+              required
+            />
+            <p role="alert" id="phone-error" class="error-message"></p>
+          </div>
+
+          <button type="submit">Отправить</button>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="/src/tests/aaa.test.js"></script>
+  </body>
+</html>
