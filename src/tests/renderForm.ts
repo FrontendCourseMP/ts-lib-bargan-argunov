@@ -1,12 +1,5 @@
-<!doctype html>
-<html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ts-val</title>
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
+export default function renderForm(): HTMLFormElement {
+  document.body.innerHTML = `
     <main>
       <section>
         <h1>Форма с валидацией</h1>
@@ -93,6 +86,12 @@
         </form>
       </section>
     </main>
-    <script type="module" src="/src/tests/aaa.test.js"></script>
-  </body>
-</html>
+  `;
+
+  const formElement = document.querySelector("#exampleForm");
+  if (!formElement || !(formElement instanceof HTMLFormElement)) {
+    throw new Error("Form not found in DOM");
+  }
+
+  return formElement;
+}

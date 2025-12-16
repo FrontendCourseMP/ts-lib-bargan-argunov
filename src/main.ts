@@ -1,4 +1,4 @@
-import * as c from "./tests/test";
+import * as c from "./lib/copyZod";
 
 const formElement = document!.querySelector("#exampleForm") as HTMLFormElement;
 
