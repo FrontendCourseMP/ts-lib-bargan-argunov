@@ -3,6 +3,7 @@ import type { FormFn, FieldValidator } from "../types/types";
 export const form: FormFn = (formElement: HTMLFormElement) => {
   const obj: Record<string, Record<string, string>> = {};
   const inputFields = formElement?.querySelectorAll("input");
+
   if (
     Array.from(inputFields).some((inputField) => {
       const ariaValue = inputField.getAttribute("aria-describedby");
@@ -20,187 +21,185 @@ export const form: FormFn = (formElement: HTMLFormElement) => {
     throw Error(
       "There is no sequence consisting of a label, an input field, and an error output field."
     );
-  } else {
-    inputFields?.length &&
-      Array.from(inputFields).forEach((inputField: HTMLInputElement) => {
-        obj[inputField.name] = {};
-      });
-    return {
-      field(fieldName: string) {
-        const inputField: HTMLInputElement | null = formElement.querySelector(
-          `input[name='${fieldName}']`
-        );
-        if (!inputField) {
-          throw Error("There is no input field with this name in this form.");
-        }
-        const validator: FieldValidator = {
-          string() {
-            if (!["text"].includes(inputField.type)) {
+  }
+
+  inputFields.forEach((inputField) => {
+    obj[inputField.name] = {};
+  });
+
+  return {
+    field(fieldName: string) {
+      const inputField: HTMLInputElement | null = formElement.querySelector(
+        `input[name='${fieldName}']`
+      );
+
+      if (!inputField) {
+        throw Error("There is no input field with this name in this form.");
+      }
+
+      const validator: FieldValidator = {
+        string() {
+          if (inputField.type !== "text") {
+            throw Error(
+              "Narrowing of types is impossible because the input type is not 'text'."
+            );
+          }
+          inputField.setAttribute("pattern", "[a-zA-Zа-яА-Я]+");
+          return validator;
+        },
+
+        number() {
+          if (!["text", "number", "range"].includes(inputField.type)) {
+            throw Error(
+              "Narrowing of types is impossible because the input type cannot be number."
+            );
+          }
+          if (inputField.type === "text") {
+            inputField.setAttribute("pattern", "[0-9]+");
+          }
+          return validator;
+        },
+
+        boolean() {
+          if (inputField.type === "text") {
+            inputField.setAttribute("pattern", "[Tt]rue|[Ff]alse");
+            return validator;
+          }
+          throw Error(
+            "Narrowing of types is impossible because the input type cannot be boolean."
+          );
+        },
+
+        email() {
+          if (inputField.type !== "email") {
+            throw Error(
+              "Narrowing of types is impossible because the input type is not 'email'."
+            );
+          }
+          return validator;
+        },
+
+        url() {
+          if (inputField.type !== "url") {
+            throw Error(
+              "Narrowing of types is impossible because the input type is not 'url'."
+            );
+          }
+          return validator;
+        },
+
+        float() {
+          if (!["text", "number", "range"].includes(inputField.type)) {
+            throw Error(
+              "Narrowing of types is impossible because the input type cannot be float."
+            );
+          }
+
+          if (inputField.type === "text") {
+            inputField.setAttribute("pattern", "^-?\\d+(\\.\\d+)?$");
+          } else {
+            inputField.step = "any";
+          }
+
+          return validator;
+        },
+
+        checkbox() {
+          if (inputField.type !== "checkbox") {
+            throw Error(
+              "Narrowing of types is impossible because the input type is not 'checkbox'."
+            );
+          }
+          return validator;
+        },
+
+        date() {
+          if (inputField.type !== "date") {
+            throw Error(
+              "Narrowing of types is impossible because the input type is not 'date'."
+            );
+          }
+          return validator;
+        },
+
+        min(error: string) {
+          if (inputField.type === "text") {
+            if (inputField.minLength === -1) {
               throw Error(
-                "Narrowing of types is impossible because the type 'text' cannot be narrowed to this type."
+                `InputField with name ${inputField.name} does not contain "minlength".`
               );
             }
-            inputField.setAttribute("pattern", "[a-zA-Zа-яА-Я]+");
-            return validator;
-          },
-          number() {
-            if (!["text", "number", "range"].includes(inputField.type)) {
+          } else if (["number", "range", "date"].includes(inputField.type)) {
+            if (inputField.min === "") {
               throw Error(
-                "Narrowing of types is impossible because the type 'text' or 'number' or 'range' cannot be narrowed to this type."
+                `InputField with name ${inputField.name} does not contain "min".`
               );
             }
-            if (inputField.type === "text") {
-              inputField.setAttribute("pattern", "[0-9]+");
+          }
+
+          obj[inputField.name]["min"] = error;
+          return validator;
+        },
+
+        max(error: string) {
+          if (inputField.type === "text") {
+            if (inputField.maxLength === -1) {
+              throw Error(
+                `InputField with name ${inputField.name} does not contain "maxlength".`
+              );
             }
-            return validator;
-          },
-          boolean() {
-            if (["text"].includes(inputField.type)) {
-              inputField.setAttribute("pattern", "[Tt]rue|[Ff]alse");
+          } else if (["number", "range", "date"].includes(inputField.type)) {
+            if (inputField.max === "") {
+              throw Error(
+                `InputField with name ${inputField.name} does not contain "max".`
+              );
             }
-            return validator;
-          },
-          min(error: string) {
-            if (inputField.type === "text") {
-              if (inputField.minLength === -1) {
-                throw Error(
-                  `InputField with name ${inputField.name} does not contain a value for the attribute "minlength"`
-                );
-              }
-            } else if (["number", "range"].includes(inputField.type)) {
-              if (inputField.min === "") {
-                throw Error(
-                  `InputField with name ${inputField.name} does not contain a value for the attribute "min"`
-                );
-              }
-            }
-            obj[inputField.name]["min"] = error;
-            return validator;
-          },
-          max: (error: string) => {
-            if (inputField.type === "text") {
-              if (inputField.maxLength === -1) {
-                throw Error(
-                  `InputField with name ${inputField.name} does not contain a value for the attribute "maxlength"`
-                );
-              }
-            } else if (["number", "range"].includes(inputField.type)) {
-              if (inputField.max === "") {
-                throw Error(
-                  `InputField with name ${inputField.name} does not contain a value for the attribute "max"`
-                );
-              }
-            }
-            obj[inputField.name]["max"] = error;
-            return validator;
-          },
-        };
-        return validator;
-      },
-      validate() {
-        formElement.addEventListener("submit", (event) => {
-          event.preventDefault();
-          inputFields.forEach((inputField) => {
-            const fieldName = inputField.name;
-            const ariaValue = inputField.getAttribute("aria-describedby");
-            const outputField =
-              ariaValue &&
-              (formElement.querySelector(`#${ariaValue}`) as HTMLOutputElement);
+          }
 
-            const fieldNameErrors = obj[fieldName];
+          obj[inputField.name]["max"] = error;
+          return validator;
+        },
+      };
 
-            if (!outputField) return;
-            if (!fieldNameErrors) return;
+      return validator;
+    },
 
-            outputField!.textContent = "";
+    validate() {
+      formElement.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-            const validity = inputField.validity;
+        inputFields.forEach((inputField) => {
+          const fieldName = inputField.name;
+          const ariaValue = inputField.getAttribute("aria-describedby");
+          const outputField =
+            ariaValue &&
+            (formElement.querySelector(
+              `#${ariaValue}`
+            ) as HTMLOutputElement);
 
-            if (!validity.valid) {
-              if (validity.rangeUnderflow) {
-                outputField.textContent = fieldNameErrors["min"]
-                  ? fieldNameErrors["min"]
-                  : inputField.validationMessage;
-                return;
-              }
+          const fieldErrors = obj[fieldName];
+          if (!outputField || !fieldErrors) return;
 
-              if (validity.rangeOverflow) {
-                outputField.textContent = fieldNameErrors["max"]
-                  ? fieldNameErrors["max"]
-                  : inputField.validationMessage;
-                return;
-              }
+          outputField.textContent = "";
 
-              if (validity.tooShort) {
-                outputField.textContent = fieldNameErrors["min"]
-                  ? fieldNameErrors["min"]
-                  : inputField.validationMessage;
-                return;
-              }
-
-              if (validity.tooLong) {
-                outputField.textContent = fieldNameErrors["max"]
-                  ? fieldNameErrors["max"]
-                  : inputField.validationMessage;
-                return;
-              }
-
-              outputField.textContent = inputField.validationMessage;
+          const validity = inputField.validity;
+          if (!validity.valid) {
+            if (validity.rangeUnderflow || validity.tooShort) {
+              outputField.textContent =
+                fieldErrors["min"] ?? inputField.validationMessage;
               return;
             }
 
-            if (fieldNameErrors["min"]) {
-              let isValid = true;
-              if (inputField.type === "text") {
-                const minLength = inputField.minLength;
-                if (minLength !== -1 && inputField.value.length < minLength) {
-                  isValid = false;
-                }
-              } else if (["number", "range"].includes(inputField.type)) {
-                const min = parseFloat(inputField.min);
-                const value = parseFloat(inputField.value);
-                if (
-                  !isNaN(min) &&
-                  inputField.value !== "" &&
-                  !isNaN(value) &&
-                  value < min
-                ) {
-                  isValid = false;
-                }
-              }
-              if (!isValid) {
-                outputField.textContent = fieldNameErrors["min"];
-                return;
-              }
+            if (validity.rangeOverflow || validity.tooLong) {
+              outputField.textContent =
+                fieldErrors["max"] ?? inputField.validationMessage;
+              return;
             }
 
-            if (fieldNameErrors["max"]) {
-              let isValid = true;
-              if (inputField.type === "text") {
-                const maxLength = inputField.maxLength;
-                if (maxLength !== -1 && inputField.value.length > maxLength) {
-                  isValid = false;
-                }
-              } else if (["number", "range"].includes(inputField.type)) {
-                const max = parseFloat(inputField.max);
-                const value = parseFloat(inputField.value);
-                if (
-                  !isNaN(max) &&
-                  inputField.value !== "" &&
-                  !isNaN(value) &&
-                  value > max
-                ) {
-                  isValid = false;
-                }
-              }
-              if (!isValid) {
-                outputField.textContent = fieldNameErrors["max"];
-                return;
-              }
-            }
-          });
+            outputField.textContent = inputField.validationMessage;
+          }
         });
-      },
-    };
-  }
+      });
+    },
+  };
 };

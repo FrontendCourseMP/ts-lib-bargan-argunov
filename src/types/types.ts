@@ -2,9 +2,18 @@
 
 // Валидатор поля, который возвращает form(...).field(...)
 export type FieldValidator = {
-  boolean: () => FieldValidator;
+  // semantic narrowing
   string: () => FieldValidator;
   number: () => FieldValidator;
+  float: () => FieldValidator;
+  boolean: () => FieldValidator;
+
+  email: () => FieldValidator;
+  url: () => FieldValidator;
+  checkbox: () => FieldValidator;
+  date: () => FieldValidator;
+
+  // constraint messages
   min: (error: string) => FieldValidator;
   max: (error: string) => FieldValidator;
 };
